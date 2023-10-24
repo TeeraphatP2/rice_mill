@@ -38,7 +38,6 @@
                         <label for="floatingPassword">รหัสผ่าน</label>
                     </div>
                     <button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary" type="submit" name="login_user">Sign up</button>
-                    <p>ยังไม่เป็นสมาชิก? <a href="register.php">สมัครสมาชิก</a></p>
                 </form>
 
             </div>

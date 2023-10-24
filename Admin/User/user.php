@@ -1,10 +1,25 @@
 <?php
+session_start();
 include '../connect/conn.php';
 $sql = "SELECT * FROM tb_user";
 $result = mysqli_query($conn, $sql);
 
 $count = mysqli_num_rows($result); //เก็บผลที่ได้จากคำสั่ง $result เก็บไว้ในตัวแปร $count
 ?>
+
+<?php
+if (!isset($_SESSION['username'])) {
+  $_SESSION['msg'] = "กรุณาล็อคอินก่อน";
+  header('location: ../login.php');
+}
+
+if (isset($_GET['logout'])) {
+  session_destroy();
+  unset($_SESSION['username']);
+  header('location: login.php');
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,6 +36,24 @@ $count = mysqli_num_rows($result); //เก็บผลที่ได้จา�
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <!-- bootstrab -->
   <link rel="stylesheet" href="../assets/bootstrab/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../assets/font-awesome-4.7.0/css/font-awesome.min.css">
+
+  <style>
+    @media (max-width: 576px) {
+
+      /* ตัวอย่าง: จัดให้ปุ่มอยู่ในบรรทัดใหม่เมื่อหน้าจอเล็ก */
+      .d-flex {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    .table td,
+    .table th {
+      white-space: nowrap;
+    }
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -33,14 +66,11 @@ $count = mysqli_num_rows($result); //เก็บผลที่ได้จา�
         <li class="nav-item">
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
-        <li class="nav-item d-none d-sm-inline-block">
-          <a href="../index.html" class="nav-link">Home</a>
-        </li>
       </ul>
 
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
-        
+
         <li class="nav-item">
           <a class="nav-link" data-widget="fullscreen" href="#" role="button">
             <i class="fas fa-expand-arrows-alt"></i>
@@ -48,7 +78,7 @@ $count = mysqli_num_rows($result); //เก็บผลที่ได้จา�
         </li>
         <li class="nav-item">
           <div class="col-md-3">
-            <button type="button" class="btn btn-danger"><a href="index.php?logout='1'" style="color:white;">logout</a></button>
+            <button type="button" class="btn btn-danger"><a href="../index.php?logout='1'" style="color:white;" class="text-decoration-none">logout</a></button>
           </div>
         </li>
       </ul>
@@ -58,9 +88,9 @@ $count = mysqli_num_rows($result); //เก็บผลที่ได้จา�
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="../index.php" class="brand-link">
-        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">โรงสีข้าวไพศาลวัฒนา</span>
+      <a href="../index.php" class="brand-link text-decoration-none">
+        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8"><br>
+        <span class="brand-text font-weight-light">ระบบจัดการข้อมูลการสีข้าว<br>โรงสีข้าวไพศาลวัฒนา</span>
       </a>
 
       <!-- Sidebar -->
@@ -71,7 +101,9 @@ $count = mysqli_num_rows($result); //เก็บผลที่ได้จา�
             <img src="../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-            <a href="#" class="d-block">Alexander Pierce</a>
+            <?php if (isset($_SESSION['username'])) : ?>
+              <p class="text-white"> Welcome <strong class="text-white"><?php echo $_SESSION['username']; ?></strong> </p>
+            <?php endif  ?>
           </div>
         </div>
 
@@ -82,31 +114,31 @@ $count = mysqli_num_rows($result); //เก็บผลที่ได้จา�
                with font-awesome or any other icon font library -->
             <li class="nav-item">
               <a href="../queue/queue.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-plus-square-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>รับข้าว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../queue/queue1.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fas fa-th" style="font-size: 19px;"></i>
                 <p>จัดทำคิว</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="../User/user.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+              <a href="../user/user.php" class="nav-link">
+                <i class="nav-icon fa fa-address-book-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>จัดการข้อมูลลูกค้า</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../Status/status.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-check-circle-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ส่งแจ้งเตือนสถานะ</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../report/report.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-file-pdf-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ออกรายงาน</p>
               </a>
             </li>
@@ -132,7 +164,7 @@ $count = mysqli_num_rows($result); //เก็บผลที่ได้จา�
             </form>
             <!-- <a href="../registerUser/register.php" class="btn btn-success mb-4 mt-4">สมัครสมาชิก</a> -->
             <div class="row">
-              <div class="col-lg-12">
+              <div class="col col-12 col-sm-12 col-lg-12 col-xl-12">
                 <div class="table-responsive">
                   <table class="table table-striped table-boredered">
                     <thead>
@@ -142,7 +174,7 @@ $count = mysqli_num_rows($result); //เก็บผลที่ได้จา�
                         <th>นามสกุล</th>
                         <th>เบอร์โทรศัพท์</th>
                         <th>แก้ไข</th>
-                        <th>ลบข้อมูล</th>
+                        <!-- <th>ลบข้อมูล</th> -->
                       </tr>
                     </thead>
                     <?php
@@ -151,19 +183,20 @@ $count = mysqli_num_rows($result); //เก็บผลที่ได้จา�
                     $i = 1;
                     while ($row = mysqli_fetch_array($result)) {
                     ?>
-                    <tbody>
-                      <tr>
-                      <td><?= $i++ ?></td>
+                      <tbody>
+                        <tr>
+                          <td><?= $i++ ?></td>
                           <td><?= $row["firstname"] ?></td>
                           <td><?= $row["lastname"] ?></td>
                           <td><?= $row["phone_number"] ?></td>
                           <td><a href="edit_user.php?id=<?= $row['UserID'] ?>" class="btn btn-warning">แก้ไข</a> </td>
-                          <td><a href="delete_user.php?id=<?= $row['UserID'] ?>" class="btn btn-danger" onclick="Del(this.href);return false;">ลบ</a> </td>
-                      </tr>
-                    <?php }
+                          <!-- <td><a href="delete_user.php?id=<? //= $row['UserID'] 
+                                                                ?>" class="btn btn-danger" onclick="Del(this.href);return false;">ลบ</a> </td> -->
+                        </tr>
+                      <?php }
                     mysqli_close($conn); //ปิดการเชื่อมต่อฐานข้อมูล 
-                    ?>
-                    </tbody>
+                      ?>
+                      </tbody>
                   </table>
                 </div>
               </div>
@@ -206,11 +239,11 @@ $count = mysqli_num_rows($result); //เก็บผลที่ได้จา�
 
 </html>
 <script language="Javascript">
-    function Del(mypage) {
-        var agree = confirm("คุณต้องการลบข้อมูลหรือไม่");
-        if (agree) {
-            window.location = mypage;
-        }
-
+  function Del(mypage) {
+    var agree = confirm("คุณต้องการลบข้อมูลหรือไม่");
+    if (agree) {
+      window.location = mypage;
     }
+
+  }
 </script>

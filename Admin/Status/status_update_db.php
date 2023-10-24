@@ -11,7 +11,7 @@
         
         if ($result){
             $alert = '<script>';
-            $alert .= 'alert("แก้ไขข้อมูลเรียบร้อยแล้ว");';
+            $alert .= 'alert("อัพเดตข้อมูลเรียบร้อยแล้ว");';
             $alert .= 'window.location.href = "./status.php";';
             $alert .= '</script>';
             echo $alert;

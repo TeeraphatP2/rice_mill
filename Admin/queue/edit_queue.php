@@ -3,9 +3,22 @@
 session_start();
 $_SESSION['queue_edit_id'] = $_GET['queue_edit_id'];
 include('../connect/conn.php');
-$sql = "SELECT * FROM `queue` WHERE QueueID = '" .$_SESSION['queue_edit_id']. "' ";
+$sql = "SELECT * FROM `queue` WHERE QueueID = '" . $_SESSION['queue_edit_id'] . "' ";
 $query = mysqli_query($conn, $sql);
 $row = mysqli_fetch_array($query);
+?>
+
+<?php
+if (!isset($_SESSION['username'])) {
+  $_SESSION['msg'] = "กรุณาล็อคอินก่อน";
+  header('location: login.php');
+}
+
+if (isset($_GET['logout'])) {
+  session_destroy();
+  unset($_SESSION['username']);
+  header('location: login.php');
+}
 ?>
 
 <!DOCTYPE html>
@@ -22,6 +35,8 @@ $row = mysqli_fetch_array($query);
   <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+
+  <link rel="stylesheet" href="../assets/font-awesome-4.7.0/css/font-awesome.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -33,9 +48,6 @@ $row = mysqli_fetch_array($query);
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-          <a href="" class="nav-link">Home</a>
         </li>
       </ul>
 
@@ -49,7 +61,7 @@ $row = mysqli_fetch_array($query);
         </li>
         <li class="nav-item">
           <div class="col-md-3">
-            <button type="button" class="btn btn-danger"><a href="index.php?logout='1'" style="color:white;">logout</a></button>
+            <button type="button" class="btn btn-danger"><a href="../index.php?logout='1'" style="color:white;" class="text-decoration-none">logout</a></button>
           </div>
         </li>
       </ul>
@@ -59,9 +71,9 @@ $row = mysqli_fetch_array($query);
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="../index.php" class="brand-link">
-        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">โรงสีข้าวไพศาลวัฒนา</span>
+      <a href="../index.php" class="brand-link text-decoration-none">
+        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8"><br>
+        <span class="brand-text font-weight-light">ระบบจัดการข้อมูลการสีข้าว<br>โรงสีข้าวไพศาลวัฒนา</span>
       </a>
 
       <!-- Sidebar -->
@@ -72,7 +84,9 @@ $row = mysqli_fetch_array($query);
             <img src="../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-            <a href="#" class="d-block">Alexander Pierce</a>
+            <?php if (isset($_SESSION['username'])) : ?>
+              <p class="text-white"> Welcome <strong class="text-white"><?php echo $_SESSION['username']; ?></strong> </p>
+            <?php endif  ?>
           </div>
         </div>
 
@@ -83,31 +97,31 @@ $row = mysqli_fetch_array($query);
                with font-awesome or any other icon font library -->
             <li class="nav-item">
               <a href="../queue/queue.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-plus-square-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>รับข้าว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../queue/queue1.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fas fa-th" style="font-size: 19px;"></i>
                 <p>จัดทำคิว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../User/user.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-address-book-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>จัดการข้อมูลลูกค้า</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../Status/status.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-check-circle-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ส่งแจ้งเตือนสถานะ</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../report/report.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-file-pdf-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ออกรายงาน</p>
               </a>
             </li>
@@ -123,7 +137,7 @@ $row = mysqli_fetch_array($query);
         <div class="card-body">
           <div class="container px-4 mt-4">
             <div class="row justify-content-center">
-              <div class="col col-8 col-sm-6 col-lg-4 col-xl-3">
+              <div class="col col-12 col-sm-12 col-lg-12 col-xl-3">
                 <h3>แก้ไข้ข้อมูลคิวสีข้าว</h3>
                 <hr>
                 <?php ?>
@@ -135,7 +149,7 @@ $row = mysqli_fetch_array($query);
                     </div>
                     <div class="mb-3">
                       <label for="rice_mill_price">ราคาสีข้าว</label>
-                      <input type="text" name="rice_mill_price" id="rice_mill_price" value="<?= $row['rice_mill_price'] ?>">
+                      <input type="text" name="rice_mill_price" id="rice_mill_price" value="<?= number_format($row['rice_mill_price']) ?>">
                     </div>
                     <button type="submit" name="edit_queue" class="btn btn-primary">บันทึก</button>
                   </div>

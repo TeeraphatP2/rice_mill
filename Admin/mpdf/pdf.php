@@ -43,6 +43,7 @@ $mpdf = new \Mpdf\Mpdf([
 ]);
 ob_start();
 ?>
+
 </head>
 
 <body>
@@ -66,14 +67,14 @@ ob_start();
       <td><?= $i++ ?></td>
       <td><?= $row['firstname'] . " " . $row['lastname'] ?></td>
       <td><?= $row['rice_type'] ?></td>
-      <td><?= $row['Number_of_sacks'] . " ถุง" ?></td>
+      <td><?= number_format($row['Number_of_sacks']) . " ถุง" ?></td>
       <td><?= $row['time_of_booking'] ?></td>
-      <td><?= $row['rice_mill_price'] . " บาท" ?></td>
+      <td><?= number_format($row['rice_mill_price']) . " บาท" ?></td>
     </tr>
     <?php endforeach ?>
     <tr>
       <td colspan="5" style="text-align: right; font-weight: bold;">สรุปราคารวม</td>
-      <td style="font-weight: bold;"><?= $row_sum['TotalSum'] . " บาท" ?></td>
+      <td style="font-weight: bold;"><?= number_format($row_sum['TotalSum']) . " บาท" ?></td>
     </tr>
   </table>
   <?php

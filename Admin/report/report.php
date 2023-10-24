@@ -14,6 +14,19 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
 }
 ?>
 
+<?php
+if (!isset($_SESSION['username'])) {
+  $_SESSION['msg'] = "กรุณาล็อคอินก่อน";
+  header('location: login.php');
+}
+
+if (isset($_GET['logout'])) {
+  session_destroy();
+  unset($_SESSION['username']);
+  header('location: login.php');
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,6 +43,24 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <!-- bootstrab -->
   <link rel="stylesheet" href="../assets/bootstrab/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../assets/font-awesome-4.7.0/css/font-awesome.min.css">
+
+  <style>
+    @media (max-width: 576px) {
+
+      /* ตัวอย่าง: จัดให้ปุ่มอยู่ในบรรทัดใหม่เมื่อหน้าจอเล็ก */
+      .d-flex {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    .table td,
+    .table th {
+      white-space: nowrap;
+    }
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -41,9 +72,6 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-          <a href="#" class="nav-link">Home</a>
         </li>
       </ul>
 
@@ -57,7 +85,7 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
         </li>
         <li class="nav-item">
           <div class="col-md-3">
-            <button type="button" class="btn btn-danger"><a href="index.php?logout='1'" style="color:white;">logout</a></button>
+            <button type="button" class="btn btn-danger"><a href="../index.php?logout='1'" style="color:white;" class="text-decoration-none">logout</a></button>
           </div>
         </li>
       </ul>
@@ -67,9 +95,9 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="../index.php" class="brand-link">
-        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">โรงสีข้าวไพศาลวัฒนา</span>
+      <a href="../index.php" class="brand-link text-decoration-none">
+        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8"><br>
+        <span class="brand-text font-weight-light">ระบบจัดการข้อมูลการสีข้าว<br>โรงสีข้าวไพศาลวัฒนา</span>
       </a>
 
       <!-- Sidebar -->
@@ -80,7 +108,9 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
             <img src="../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-            <a href="#" class="d-block">Alexander Pierce</a>
+            <?php if (isset($_SESSION['username'])) : ?>
+              <p class="text-white"> Welcome <strong class="text-white"><?php echo $_SESSION['username']; ?></strong> </p>
+            <?php endif  ?>
           </div>
         </div>
 
@@ -91,31 +121,31 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
                with font-awesome or any other icon font library -->
             <li class="nav-item">
               <a href="../queue/queue.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-plus-square-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>รับข้าว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../queue/queue1.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fas fa-th" style="font-size: 19px;"></i>
                 <p>จัดทำคิว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../user/user.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-address-book-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>จัดการข้อมูลลูกค้า</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../Status/status.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-check-circle-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ส่งแจ้งเตือนสถานะ</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="report.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-file-pdf-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ออกรายงาน</p>
               </a>
             </li>
@@ -131,7 +161,7 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
           <!--  เพิ่มข้อมูล User end-->
           <div class="container">
             <div class="row mt-4">
-              <div class="col-lg-12 d-flex justify-content-between align-items-center">
+              <div class="col col-12 col-sm-12 col-lg-12 col-xl-12 d-flex justify-content-between align-items-center">
                 <div>
                   <h4 class="text-primary">ออกรายงานตามช่วงเวลา</h4>
                 </div>
@@ -139,26 +169,30 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
             </div>
             <hr>
             <div class="row">
+              <div class="d-flex justify-content-end">
+                <a href="report_rice_type.php" class="btn btn-primary">ออกรายงานตามประเภทข้าว</a>
+              </div>
               <form action="#" method="get">
-                <div class="mb-3">
-                  <label for="start_date" class="form-label">วันเริ่มต้น:</label>
-                  <input type="date" class="form-control" id="start_date" name="start_date" required>
+                <div class="mb-3 d-flex">
+                  <label for="start_date">วันเริ่มต้น:</label>
+                  <input type="date" id="start_date" name="start_date" required>
                 </div>
 
-                <div class="mb-3">
-                  <label for="end_date" class="form-label">วันสิ้นสุด:</label>
-                  <input type="date" class="form-control" id="end_date" name="end_date" required>
+                <div class="mb-3 d-flex">
+                  <label for="end_date">วันสิ้นสุด:</label>
+                  <input type="date" id="end_date" name="end_date" required>
                 </div>
+
                 <button type="submit" class="btn btn-primary" name="search">ค้นหา</button>
               </form>
             </div>
 
             <!-- เริ่มตารางแสดงคิวทั้งหมด -->
             <div class="row">
-              <div class="col-lg-12">
+              <div class="col col-12 col-sm-12 col-lg-12 col-xl-12">
                 <div class="table-responsive">
                   <?php
-                  $sql = "SELECT * FROM `queue_arranged` INNER JOIN tb_user USING(UserID) INNER JOIN rm_info USING(RiceMillingID) WHERE DATE(time_of_booking) BETWEEN '$start_date' AND '$end_date';";
+                  $sql = "SELECT * FROM `queue_arranged` INNER JOIN tb_user USING(UserID) INNER JOIN rm_info USING(RiceMillingID) WHERE DATE(time_of_booking) BETWEEN '$start_date' AND '$end_date' ORDER BY `time_queue_arranged` ASC;";
                   $result = mysqli_query($conn, $sql);
                   ?>
 
@@ -182,9 +216,9 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
                             <td><?= $i++ ?></td>
                             <td><?= $row['firstname'] . " " . $row['lastname'] ?></td>
                             <td><?= $row['rice_type'] ?></td>
-                            <td><?= $row['Number_of_sacks'] . " ถุง" ?></td>
+                            <td><?= number_format($row['Number_of_sacks']) . " ถุง" ?></td>
                             <td><?= $row['time_of_booking'] ?></td>
-                            <td><?= $row['rice_mill_price'] . " บาท" ?></td>
+                            <td><?= number_format($row['rice_mill_price']) . " บาท" ?></td>
                             <td><?= $row['status'] ?></td>
                           </tr>
                         <?php endforeach ?>
@@ -212,7 +246,7 @@ if (isset($_GET["start_date"]) && !empty($_GET["end_date"])) {
                     <input type="date" class="form-control" name="end_date" value="<?= $_GET['end_date'] ?>" required>
                   </div>
                   <div class="container text-center mt-3">
-                    <button type="submit" name="report" class="btn btn-danger mx-auto">ออกรายงาน PDF</button>
+                    <button type="submit" name="report" class="btn btn-success mx-auto">ออกรายงาน PDF</button>
                   </div>
                 </form>
               </div>

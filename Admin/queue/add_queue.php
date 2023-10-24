@@ -1,12 +1,33 @@
 <?php
 session_start();
 include_once '../connect/conn.php';
-// $_SESSION['id_user_add_queue'] = $_GET['id_user_add_queue'];
+// $_SESSION['sert_name'] = $_GET["sert_name"];
 ?>
 
 <?php
 $sql = "SELECT * FROM `rm_info` ";
 $result = mysqli_query($conn, $sql);
+?>
+
+<?php
+if (isset($_GET["add_queue_user_id_sert"]) && !empty($_GET["add_queue_user_id_sert"])) {
+  $add_queue_user_id_sert = $_GET["add_queue_user_id_sert"];
+  $sql_sert = "SELECT * FROM tb_user WHERE UserID = '$add_queue_user_id_sert'";
+  $result_sert = mysqli_query($conn, $sql_sert); //รันคำสั่งที่ถูกเก็บไว้ในตัวแปร $sql
+}
+?>
+
+<?php
+if (!isset($_SESSION['username'])) {
+  $_SESSION['msg'] = "กรุณาล็อคอินก่อน";
+  header('location: login.php');
+}
+
+if (isset($_GET['logout'])) {
+  session_destroy();
+  unset($_SESSION['username']);
+  header('location: login.php');
+}
 ?>
 
 <!DOCTYPE html>
@@ -23,7 +44,10 @@ $result = mysqli_query($conn, $sql);
   <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">
+
   <link rel="stylesheet" href="../assets/bootstrab/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../assets/font-awesome-4.7.0/css/font-awesome.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -35,9 +59,6 @@ $result = mysqli_query($conn, $sql);
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-          <a href="" class="nav-link">Home</a>
         </li>
       </ul>
 
@@ -51,7 +72,7 @@ $result = mysqli_query($conn, $sql);
         </li>
         <li class="nav-item">
           <div class="col-md-3">
-            <button type="button" class="btn btn-danger"><a href="index.php?logout='1'" style="color:white;">logout</a></button>
+            <button type="button" class="btn btn-danger"><a href="../index.php?logout='1'" style="color:white;"  class="text-decoration-none">logout</a></button>
           </div>
         </li>
       </ul>
@@ -61,9 +82,9 @@ $result = mysqli_query($conn, $sql);
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="../index.php" class="brand-link">
-        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">โรงสีข้าวไพศาลวัฒนา</span>
+      <a href="../index.php" class="brand-link text-decoration-none">
+        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8"><br>
+        <span class="brand-text font-weight-light">ระบบจัดการข้อมูลการสีข้าว<br>โรงสีข้าวไพศาลวัฒนา</span>
       </a>
 
       <!-- Sidebar -->
@@ -74,7 +95,9 @@ $result = mysqli_query($conn, $sql);
             <img src="../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-            <a href="#" class="d-block">Alexander Pierce</a>
+            <?php if (isset($_SESSION['username'])) : ?>
+              <p class="text-white"> Welcome <strong class="text-white"><?php echo $_SESSION['username']; ?></strong> </p>
+            <?php endif  ?>
           </div>
         </div>
 
@@ -125,21 +148,48 @@ $result = mysqli_query($conn, $sql);
         <div class="card-body">
           <div class="container px-4 mt-4">
             <div class="row justify-content-center">
-              <div class="col col-8 col-sm-6 col-lg-4 col-xl-3">
+              <div class="col col-12 col-sm-9 col-lg-6 col-xl-6">
+                <form action="add_queue_sert_user.php" class="form-group my-3" method="GET">
+                  <div class="row">
+                    <div class="col-6">
+                      <input type="text" placeholder="ค้นหาชื่อลูกค้า" class="form-control" name="sert_name" required>
+                    </div>
+                    <div class="col-6">
+                      <input type="submit" value="ค้นหา" class="btn btn-info">
+                    </div>
+                  </div>
+                </form>
                 <form action="add_queue_db.php" method="post" class="p-2">
                   <div class="mb-3 gx-3">
-                    <div class="col mt-3">
-                      <label for="firstname" class="form-label">ชื่อจริง</label>
-                      <input type="text" class="form-control" name="firstname" aria-describedby="firstname">
-                    </div>
-                    <div class="col mt-3">
-                      <label for="lastname" class="form-label">นามสกุล</label>
-                      <input type="text" class="form-control" name="lastname" aria-describedby="lastname">
-                    </div>
-                    <div class="col mt-3">
-                      <label for="phoneNumber" class="form-label">เบอร์โทรศัพท์</label>
-                      <input type="number" class="form-control" name="phoneNumber" aria-describedby="phoneNumber">
-                    </div>
+                    <?php if (isset($result_sert)) : ?>
+                      <?php while ($row = mysqli_fetch_array($result_sert)) : ?>
+                        <div class="col mt-3">
+                          <label for="firstname" class="form-label">ชื่อจริง</label>
+                          <input type="text" class="form-control" name="firstname" value="<?= $row['firstname'] ?>" readonly>
+                        </div>
+                        <div class="col mt-3">
+                          <label for="lastname" class="form-label">นามสกุล</label>
+                          <input type="text" class="form-control" name="lastname" value="<?= $row['lastname'] ?>" readonly>
+                        </div>
+                        <div class="col mt-3">
+                          <label for="phoneNumber" class="form-label">เบอร์โทรศัพท์</label>
+                          <input type="number" class="form-control" name="phoneNumber" value="<?= $row['phone_number'] ?>" readonly>
+                        </div>
+                      <?php endwhile ?>
+                    <?php else : ?>
+                      <div class="col mt-3">
+                        <label for="firstname" class="form-label">ชื่อจริง</label>
+                        <input type="text" class="form-control" name="firstname">
+                      </div>
+                      <div class="col mt-3">
+                        <label for="lastname" class="form-label">นามสกุล</label>
+                        <input type="text" class="form-control" name="lastname">
+                      </div>
+                      <div class="col mt-3">
+                        <label for="phoneNumber" class="form-label">เบอร์โทรศัพท์</label>
+                        <input type="number" class="form-control" name="phoneNumber">
+                      </div>
+                    <?php endif ?>
                     <div class="col mt-3">
                       <select class="form-select form-select-lg" aria-label="Default select example" name="rice_type_select" required>
                         <option disabled selected>เลือกชนิดข้าว</option>
@@ -159,8 +209,14 @@ $result = mysqli_query($conn, $sql);
                     <div class="col mt-3">
                       <input type="number" name="Number_sacks" id="Number_sacks" class="form-control form-control-lg" placeholder="จำนวนถุง" oninput="this.value = Math.abs(this.value)" required>
                     </div>
-                    <div class="md-3">
-                      <button class="btn btn-primary btn-block btn-lg mt-3" type="submit" name="add_queue">รับข้าว</button>
+                    <div class="col-12 md-6">
+                      <?php if (isset($result_sert)) : ?>
+                        <?php foreach ($result_sert as $row) : ?>
+                          <button class="btn btn-primary btn-block btn-lg mt-3" type="submit" name="add_queue" value="<?= $row['UserID'] ?>">รับข้าว</button>
+                        <?php endforeach ?>
+                      <?php else : ?>
+                        <button class="btn btn-primary btn-block btn-lg mt-3" type="submit" name="add_queue">รับข้าว</button>
+                      <?php endif ?>
                     </div>
                   </div>
                 </form>
@@ -210,7 +266,7 @@ $result = mysqli_query($conn, $sql);
 
     // ตรวจสอบว่าค่าที่ป้อนมีความยาวเท่ากับ 1 และเป็นเลข 0
     if (inputValue.length === 1 && inputValue === "0") {
-      this.setCustomValidity("กรุณาป้อนเลขที่มีค่ามากกว่า 0 อิอิ");
+      this.setCustomValidity("กรุณาป้อนเลขที่มีค่ามากกว่า 0");
     } else {
       this.setCustomValidity("");
     }

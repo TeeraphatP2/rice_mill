@@ -8,6 +8,19 @@ $sql = "SELECT * FROM `rm_info`";
 $result = mysqli_query($conn, $sql);
 ?>
 
+<?php
+if (!isset($_SESSION['username'])) {
+  $_SESSION['msg'] = "กรุณาล็อคอินก่อน";
+  header('location: login.php');
+}
+
+if (isset($_GET['logout'])) {
+  session_destroy();
+  unset($_SESSION['username']);
+  header('location: login.php');
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,6 +37,24 @@ $result = mysqli_query($conn, $sql);
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <!-- bootstrab -->
   <link rel="stylesheet" href="../assets/bootstrab/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../assets/font-awesome-4.7.0/css/font-awesome.min.css">
+
+  <style>
+    @media (max-width: 576px) {
+
+      /* ตัวอย่าง: จัดให้ปุ่มอยู่ในบรรทัดใหม่เมื่อหน้าจอเล็ก */
+      .d-flex {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    .table td,
+    .table th {
+      white-space: nowrap;
+    }
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -35,9 +66,6 @@ $result = mysqli_query($conn, $sql);
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-          <a href="#" class="nav-link">Home</a>
         </li>
       </ul>
 
@@ -51,7 +79,7 @@ $result = mysqli_query($conn, $sql);
         </li>
         <li class="nav-item">
           <div class="col-md-3">
-            <button type="button" class="btn btn-danger"><a href="index.php?logout='1'" style="color:white;">logout</a></button>
+            <button type="button" class="btn btn-danger"><a href="../index.php?logout='1'" style="color:white;" class="text-decoration-none">logout</a></button>
           </div>
         </li>
       </ul>
@@ -61,9 +89,9 @@ $result = mysqli_query($conn, $sql);
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="../index.php" class="brand-link">
-        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">โรงสีข้าวไพศาลวัฒนา</span>
+      <a href="../index.php" class="brand-link text-decoration-none">
+        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8"><br>
+        <span class="brand-text font-weight-light">ระบบจัดการข้อมูลการสีข้าว<br>โรงสีข้าวไพศาลวัฒนา</span>
       </a>
 
       <!-- Sidebar -->
@@ -74,7 +102,9 @@ $result = mysqli_query($conn, $sql);
             <img src="../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-            <a href="#" class="d-block">Alexander Pierce</a>
+            <?php if (isset($_SESSION['username'])) : ?>
+              <p class="text-white"> Welcome <strong class="text-white"><?php echo $_SESSION['username']; ?></strong> </p>
+            <?php endif  ?>
           </div>
         </div>
 
@@ -85,31 +115,31 @@ $result = mysqli_query($conn, $sql);
                with font-awesome or any other icon font library -->
             <li class="nav-item">
               <a href="../queue/queue.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-plus-square-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>รับข้าว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../queue/queue1.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fas fa-th" style="font-size: 19px;"></i>
                 <p>จัดทำคิว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../user/user.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-address-book-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>จัดการข้อมูลลูกค้า</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../Status/status.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-check-circle-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ส่งแจ้งเตือนสถานะ</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../report/report.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-file-pdf-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ออกรายงาน</p>
               </a>
             </li>
@@ -123,23 +153,23 @@ $result = mysqli_query($conn, $sql);
       <div class="card">
         <div class="card-body">
           <div class="container">
-            
+
             <div class="row mt-4">
               <div class="col-lg-12 d-flex justify-content-between align-items-center">
                 <div>
-                  <h4 class="text-primary">รายการคิวข้าวที่จัดแล้วทั้งหมด</h4>
+                  <h4 class="text-primary">รายการคิวข้าวที่จัดแล้วทั้งหมด/อัพเดตสถานะ</h4>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <a href="status_history.php" class="btn btn-primary">จัดการประวัติสถานะ</a>
                 </div>
               </div>
             </div>
             <hr>
             <!-- เริ่มตารางแสดงคิวทั้งหมด -->
             <div class="row">
-              <div class="col-lg-12">
+
+              <div class="col col-12 col-sm-12 col-lg-12 col-xl-12">
                 <div class="table-responsive">
-                  <?php
-                  $sql = "SELECT * FROM `queue` INNER JOIN tb_user USING(UserID) INNER JOIN rm_info USING(RiceMillingID);";
-                  $result = mysqli_query($conn, $sql);
-                  ?>
                   <table class="table table-striped table-boredered">
                     <thead>
                       <tr>
@@ -154,21 +184,21 @@ $result = mysqli_query($conn, $sql);
                       </tr>
                     </thead>
                     <tbody>
-                    <?php 
-                    $sql_queue = "SELECT * FROM `queue_arranged` INNER JOIN tb_user USING(UserID) INNER JOIN rm_info USING(RiceMillingID) ORDER BY `time_queue_arranged` ASC";
-                    $result_queue = mysqli_query($conn, $sql_queue);
-                    ?>
-                    <?php $i = 1?>
-                    <?php foreach ($result_queue as $row) : ?>
-                      <tr>
+                      <?php
+                      $sql_queue = "SELECT * FROM `queue_arranged` INNER JOIN tb_user USING(UserID) INNER JOIN rm_info USING(RiceMillingID) WHERE `status` != 'ลูกค้ารับข้าวไปแล้ว' AND (`status` = 'รอดำเนินการ' OR `status` = 'กำลังดำเนินการ' OR `status` = 'เสร็จสิ้น') ORDER BY `time_queue_arranged` ASC;";
+                      $result_queue = mysqli_query($conn, $sql_queue);
+                      ?>
+                      <?php $i = 1 ?>
+                      <?php foreach ($result_queue as $row) : ?>
+                        <tr>
                           <td><?= $i++ ?></td>
-                          <td><?= $row['firstname'] ." ". $row['lastname'] ?> </td>
-                          <td><?= $row['rice_type']?> </td>
-                          <td><?= $row['Number_of_sacks']?> </td>
-                          <td><?= $row['time_of_booking']?> </td>
-                          <td><?= $row['rice_mill_price']?> </td>
-                          <td><?= $row['status']?> </td>
-                          <td><a href="status_update.php?status_update_id=<?= $row['QueueID']?>"class="btn btn-warning">อัพเดต</a></td>
+                          <td><?= $row['firstname'] . " " . $row['lastname'] ?> </td>
+                          <td><?= $row['rice_type'] ?> </td>
+                          <td><?= number_format($row['Number_of_sacks']) . " ถุง" ?> </td>
+                          <td><?= $row['time_of_booking'] ?> </td>
+                          <td><?= number_format($row['rice_mill_price']) . " บาท" ?> </td>
+                          <td><?= $row['status'] ?> </td>
+                          <td><a href="status_update.php?status_update_id=<?= $row['QueueID'] ?>" class="btn btn-warning">อัพเดต</a></td>
                         </tr>
                       <?php endforeach ?>
                     </tbody>

@@ -68,7 +68,7 @@ ob_start();
     </tr>
     <tr>
       <td style="text-align: left;">จำนวนถุง</td>
-      <td style="text-align: right;"><?= $row['Number_of_sacks'] . " ถุง" ?></td>
+      <td style="text-align: right;"><?= number_format($row['Number_of_sacks']) . " ถุง" ?></td>
     </tr>
     <tr>
       <td style="text-align: left;">เวลาที่รับข้าว</td>
@@ -79,7 +79,7 @@ ob_start();
   <table>
   <tr>
       <td style="text-align: left; font-weight: bold;">ราคาสีข้าว</td>
-      <td style="text-align: right; font-weight: bold;"><?= $row['rice_mill_price'] . " บาท" ?></td>
+      <td style="text-align: right; font-weight: bold;"><?= number_format($row['rice_mill_price']) . " บาท" ?></td>
     </tr>
   </table>
   <h4 style="text-align: center;">===============================</h4>

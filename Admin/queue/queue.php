@@ -9,12 +9,16 @@ $result = mysqli_query($conn, $sql);
 ?>
 
 <?php
-// if (isset($_GET["sert_name"]) && !empty($_GET["sert_name"])) {
-//   $sert_name = $_GET["sert_name"];
-//   $sql_sert = "SELECT * FROM tb_user WHERE username LIKE '%$sert_name%' OR phone_number LIKE '%$sert_name%' ORDER BY username ASC ";
-//   $result_sert = mysqli_query($conn, $sql_sert); //รันคำสั่งที่ถูกเก็บไว้ในตัวแปร $sql
-//   $count_sert = mysqli_num_rows($result_sert); //เก็บผลที่ได้จากคำสั่ง $result เก็บไว้ในตัวแปร $count
-// }
+if (!isset($_SESSION['username'])) {
+  $_SESSION['msg'] = "กรุณาล็อคอินก่อน";
+  header('location: login.php');
+}
+
+if (isset($_GET['logout'])) {
+  session_destroy();
+  unset($_SESSION['username']);
+  header('location: login.php');
+}
 ?>
 
 <!DOCTYPE html>
@@ -33,6 +37,24 @@ $result = mysqli_query($conn, $sql);
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <!-- bootstrab -->
   <link rel="stylesheet" href="../assets/bootstrab/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../assets/font-awesome-4.7.0/css/font-awesome.min.css">
+
+  <style>
+    @media (max-width: 576px) {
+
+      /* ตัวอย่าง: จัดให้ปุ่มอยู่ในบรรทัดใหม่เมื่อหน้าจอเล็ก */
+      .d-flex {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    .table td,
+    .table th {
+      white-space: nowrap;
+    }
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -44,9 +66,6 @@ $result = mysqli_query($conn, $sql);
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-          <a href="#" class="nav-link">Home</a>
         </li>
       </ul>
 
@@ -60,7 +79,7 @@ $result = mysqli_query($conn, $sql);
         </li>
         <li class="nav-item">
           <div class="col-md-3">
-            <button type="button" class="btn btn-danger"><a href="index.php?logout='1'" style="color:white;">logout</a></button>
+            <button type="button" class="btn btn-danger"><a href="../index.php?logout='1'" style="color:white;" class="text-decoration-none">logout</a></button>
           </div>
         </li>
       </ul>
@@ -70,9 +89,9 @@ $result = mysqli_query($conn, $sql);
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="../index.php" class="brand-link">
-        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">โรงสีข้าวไพศาลวัฒนา</span>
+      <a href="../index.php" class="brand-link text-decoration-none">
+        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8"><br>
+        <span class="brand-text font-weight-light">ระบบจัดการข้อมูลการสีข้าว<br>โรงสีข้าวไพศาลวัฒนา</span>
       </a>
 
       <!-- Sidebar -->
@@ -83,7 +102,9 @@ $result = mysqli_query($conn, $sql);
             <img src="../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-            <a href="#" class="d-block">Alexander Pierce</a>
+            <?php if (isset($_SESSION['username'])) : ?>
+              <p class="text-white"> Welcome <strong class="text-white"><?php echo $_SESSION['username']; ?></strong> </p>
+            <?php endif  ?>
           </div>
         </div>
 
@@ -94,31 +115,31 @@ $result = mysqli_query($conn, $sql);
                with font-awesome or any other icon font library -->
             <li class="nav-item">
               <a href="queue.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-plus-square-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>รับข้าว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../queue/queue1.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fas fa-th" style="font-size: 19px;"></i>
                 <p>จัดทำคิว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../user/user.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-address-book-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>จัดการข้อมูลลูกค้า</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../Status/status.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-check-circle-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ส่งแจ้งเตือนสถานะ</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../report/report.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-file-pdf-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ออกรายงาน</p>
               </a>
             </li>
@@ -146,18 +167,6 @@ $result = mysqli_query($conn, $sql);
               </div>
             </div>
             <hr>
-            <!-- เรื่มฟอร์มจัดทำคิว-->
-            <div class="modal fade" tabindex="-1" id="queue">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-header">รับข้าวลูกค้า</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- จบฟอร์มจัดทำคิว-->
 
             <!-- เริ่มฟอร์มเพิ่มชนิดข้าว-->
             <div class="modal fade" tabindex="-1" id="addrice">
@@ -175,10 +184,10 @@ $result = mysqli_query($conn, $sql);
                           <input type="text" name="rice_type" class="form-control form-control-lg" placeholder="ชนิดข้าว" required><br>
                         </div>
                         <div class="col">
-                          <input type="number" name="rice_price_pui_b" class="form-control form-control-lg" placeholder="ราคาข้าวต่อถุงปุ้ย" required><br>
+                          <input type="number" name="rice_price_pui_b" id="rice_price_pui_b" class="form-control form-control-lg" placeholder="ราคาข้าวต่อถุงปุ้ย" required><br>
                         </div>
                         <div class="col">
-                          <input type="number" name="rice_price_parn_b" class="form-control form-control-lg" placeholder="ราคาข้าวต่อถุงป่าน" required><br>
+                          <input type="number" name="rice_price_parn_b" id="rice_price_parn_b" class="form-control form-control-lg" placeholder="ราคาข้าวต่อถุงป่าน" required><br>
                         </div>
                         <div class="md-3">
                           <button class="btn btn-primary btn-block btn-lg mt-3" type="submit">บันทึก</button>
@@ -194,7 +203,7 @@ $result = mysqli_query($conn, $sql);
 
             <!-- เริ่มตารางแสดงคิวทั้งหมด -->
             <div class="row">
-              <div class="col-lg-12">
+              <div class="col col-12 col-sm-12 col-lg-12 col-xl-12">
                 <div class="table-responsive">
                   <?php
                   $sql = "SELECT * FROM `queue` INNER JOIN tb_user USING(UserID) INNER JOIN rm_info USING(RiceMillingID) ORDER BY time_of_booking ASC;";
@@ -226,12 +235,12 @@ $result = mysqli_query($conn, $sql);
                           <td><?= $i++ ?></td>
                           <td><?= $row['firstname'] . " " . $row['lastname'] ?></td>
                           <td><?= $row['rice_type'] ?></td>
-                          <td><?= $row['Number_of_sacks'] . " ถุง" ?></td>
+                          <td><?= number_format($row['Number_of_sacks']) . " ถุง" ?></td>
                           <td><?= $row['time_of_booking'] ?></td>
-                          <td><?= $row['rice_mill_price'] . " บาท" ?></td>
-                          <td><?= $row['status'] . "จัดคิว"?></td>
+                          <td><?= number_format($row['rice_mill_price']) . " บาท" ?></td>
+                          <td><?= $row['status'] . "จัดคิว" ?></td>
                           <td><a href="edit_queue.php?queue_edit_id=<?= $row['QueueID'] ?>" class="btn btn-success btn-sm rounded-pull py-0 editlink">แก้ไข</a></td>
-                          <td><a href="queue_delete_db.php?queue_del_id=<?= $row['QueueID'] ?>" class="btn btn-danger btn-sm rounded-pull py-0 deletelink" onclick="return confirm('คุณต้องการลบคิว <?= $row['rice_type'] ?> หรือไม่')">ลบ</a></td>
+                          <td><a href="queue_delete_db.php?queue_del_id=<?= $row['QueueID'] ?>" class="btn btn-danger btn-sm rounded-pull py-0 deletelink" onclick="return confirm('คุณต้องการลบข้อมูลรับข้าวของ <?= $row['firstname'] ?> หรือไม่')">ลบ</a></td>
                         </tr>
                       <?php endforeach ?>
                     </tbody>
@@ -251,10 +260,6 @@ $result = mysqli_query($conn, $sql);
             <!-- เริ่มหน้ารวมจำนวนข้าวที่รับ -->
             <div class="row">
               <?php
-              //$sql_sum = "SELECT SUM(Number_of_sacks),rm_info.rice_type AS total_sacks FROM queue INNER JOIN rm_info USING(RiceMillingID) GROUP BY RiceMillingID = '3';";
-              //$sql_sum = "SELECT SUM(Number_of_sacks) AS total_sacks FROM queue INNER JOIN rm_info USING(RiceMillingID) GROUP BY RiceMillingID ORDER BY total_sacks DESC ;";
-              //$result_sum =mysqli_query($conn, $sql_sum);
-              //$row_sum = mysqli_fetch_assoc($result_sum);
               $sql_sum = "SELECT SUM(Number_of_sacks) AS total_sacks, rm_info.rice_type FROM queue INNER JOIN rm_info USING(RiceMillingID) GROUP BY RiceMillingID ORDER BY total_sacks DESC;";
               $result_sum = mysqli_query($conn, $sql_sum);
               $rice_types = array();
@@ -277,16 +282,11 @@ $result = mysqli_query($conn, $sql);
                 <div class="card">
                   <div class="card-body">
                     <p class="card-text"><?= "มีชนิดข้าวที่รับมาสี $num_rice_types ชนิด" ?></p>
-                    <?php
-                    // while ($row_sum = mysqli_fetch_assoc($result_sum)) {
-                    //   $rice_type = $row_sum['rice_type'];
-                    //   $total_sacks = $row_sum['total_sacks'];
-                    //} 
-                    ?>
+
                     <?php
                     foreach ($rice_types as $rice_type => $total_sacks) {
                     ?>
-                      <p class="card-text"><?= "$rice_type : $total_sacks ถุง" ?></p>
+                      <p class="card-text"><?= "$rice_type : " . number_format($total_sacks) . " ถุง" ?></p>
                     <?php } ?>
 
                   </div>
@@ -295,7 +295,7 @@ $result = mysqli_query($conn, $sql);
             </div>
             <!-- จบหน้ารวมจำนวนข้าวที่รับ -->
             <!-- เริ่มตารางแสดงประเภทข้าวทั้งหมด -->
-            <div class="row mt-4">
+            <div class="row">
               <div class="col-lg-12 d-flex justify-content-between align-items-center">
                 <div>
                   <h4 class="text-primary">อัตราค่าบริการสีข้าว</h4>
@@ -307,8 +307,8 @@ $result = mysqli_query($conn, $sql);
             $result = mysqli_query($conn, $sql);
             ?>
             <div class="row">
-              <div class="col-lg-12">
-                <div class="table">
+              <div class="col col-12 col-sm-12 col-lg-12 col-xl-12">
+                <div class="table-responsive">
                   <table class="table table-striped table-boredered">
                     <thead>
                       <tr>
@@ -326,8 +326,8 @@ $result = mysqli_query($conn, $sql);
                         <tr>
                           <td><?= $i++ ?></td>
                           <td><?= $row['rice_type'] ?></td>
-                          <td><?= $row['rice_price_pui_bag'] ?> บาท</td>
-                          <td><?= $row['rice_price_parn_bag'] ?> บาท</td>
+                          <td><?= number_format($row['rice_price_pui_bag']) ?> บาท</td>
+                          <td><?= number_format($row['rice_price_parn_bag']) ?> บาท</td>
                           <td><a href="rice_type_edit.php?rice_edit_id=<?= $row['RiceMillingID'] ?>" class="btn btn-success btn-sm rounded-pull py-0 editlink">แก้ไข</a></td>
                           <td><a href="rice_type_delete_db.php?rice_del_id=<?= $row['RiceMillingID'] ?>" class="btn btn-danger btn-sm rounded-pull py-0 deletelink" onclick="return confirm('คุณต้องการลบ <?= $row['rice_type'] ?> หรือไม่')">ลบ</a></td>
                         </tr>
@@ -374,17 +374,29 @@ $result = mysqli_query($conn, $sql);
   <!-- AdminLTE App -->
   <script src="../dist/js/adminlte.min.js"></script>
 
-  <?php
-  if (isset($_GET['sert_name'])) {
-    echo "
-        <script>
-        $(document).ready(function () {
-            $('#queue').modal('show');
-        });
-        </script>";
-  }
-  ?>
-
 </body>
 
 </html>
+<script>
+  document.getElementById("rice_price_pui_b").addEventListener("input", function() {
+    var rice_price_pui_b = this.value;
+
+    // ตรวจสอบว่าค่าที่ป้อนมีความยาวเท่ากับ 1 และเป็นเลข 0
+    if (rice_price_pui_b.length === 1 && rice_price_pui_b === "0") {
+      this.setCustomValidity("กรุณาป้อนเลขที่มีค่ามากกว่า 0");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+
+  document.getElementById("rice_price_parn_b").addEventListener("input", function() {
+    var rice_price_parn_b = this.value;
+
+    // ตรวจสอบว่าค่าที่ป้อนมีความยาวเท่ากับ 1 และเป็นเลข 0
+    if (rice_price_parn_b.length === 1 && rice_price_parn_b === "0") {
+      this.setCustomValidity("กรุณาป้อนเลขที่มีค่ามากกว่า 0");
+    } else {
+      this.setCustomValidity("");
+    }
+  });
+</script>

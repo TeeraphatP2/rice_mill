@@ -9,6 +9,19 @@ $sql = "SELECT * FROM `rm_info`";
 $result = mysqli_query($conn, $sql);
 ?>
 
+<?php
+if (!isset($_SESSION['username'])) {
+  $_SESSION['msg'] = "กรุณาล็อคอินก่อน";
+  header('location: login.php');
+}
+
+if (isset($_GET['logout'])) {
+  session_destroy();
+  unset($_SESSION['username']);
+  header('location: login.php');
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,6 +38,28 @@ $result = mysqli_query($conn, $sql);
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <!-- bootstrab -->
   <link rel="stylesheet" href="../assets/bootstrab/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../assets/font-awesome-4.7.0/css/font-awesome.min.css">
+  <style>
+    @media (max-width: 576px) {
+
+      /* ตัวอย่าง: จัดให้ปุ่มอยู่ในบรรทัดใหม่เมื่อหน้าจอเล็ก */
+      .d-flex {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    .table td,
+    .table th {
+      white-space: nowrap;
+    }
+
+    .radio-group input[type="radio"] {
+      margin-left: 20px;
+      /* เพิ่มระยะห่างด้านขวาของ radio แต่ละตัว */
+    }
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -36,9 +71,6 @@ $result = mysqli_query($conn, $sql);
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-          <a href="#" class="nav-link">Home</a>
         </li>
       </ul>
 
@@ -52,7 +84,7 @@ $result = mysqli_query($conn, $sql);
         </li>
         <li class="nav-item">
           <div class="col-md-3">
-            <button type="button" class="btn btn-danger"><a href="index.php?logout='1'" style="color:white;">logout</a></button>
+            <button type="button" class="btn btn-danger"><a href="../index.php?logout='1'" style="color:white;" class="text-decoration-none">logout</a></button>
           </div>
         </li>
       </ul>
@@ -62,9 +94,9 @@ $result = mysqli_query($conn, $sql);
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="../index.php" class="brand-link">
-        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">โรงสีข้าวไพศาลวัฒนา</span>
+      <a href="../index.php" class="brand-link text-decoration-none">
+        <img src="../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8"><br>
+        <span class="brand-text font-weight-light">ระบบจัดการข้อมูลการสีข้าว<br>โรงสีข้าวไพศาลวัฒนา</span>
       </a>
 
       <!-- Sidebar -->
@@ -75,7 +107,9 @@ $result = mysqli_query($conn, $sql);
             <img src="../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
-            <a href="#" class="d-block">Alexander Pierce</a>
+            <?php if (isset($_SESSION['username'])) : ?>
+              <p class="text-white"> Welcome <strong class="text-white"><?php echo $_SESSION['username']; ?></strong> </p>
+            <?php endif  ?>
           </div>
         </div>
 
@@ -86,31 +120,31 @@ $result = mysqli_query($conn, $sql);
                with font-awesome or any other icon font library -->
             <li class="nav-item">
               <a href="queue.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-plus-square-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>รับข้าว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../queue/queue1.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fas fa-th" style="font-size: 19px;"></i>
                 <p>จัดทำคิว</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../user/user.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-address-book-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>จัดการข้อมูลลูกค้า</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../Status/status.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-check-circle-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ส่งแจ้งเตือนสถานะ</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="../report/report.php" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+                <i class="nav-icon fa fa-file-pdf-o" style="font-size: 24px;" aria-hidden="true"></i>
                 <p>ออกรายงาน</p>
               </a>
             </li>
@@ -133,41 +167,42 @@ $result = mysqli_query($conn, $sql);
               </div>
             </div>
             <hr>
-            <!-- เริ่มตารางแสดงคิวทั้งหมด -->
+            <!-- เริ่มแสดงการอัพเตตสถานะ -->
             <div class="row">
-              <form action="status_update_db.php" method="post">
-                <?php
-                $sql_su = "SELECT * FROM `queue_arranged` INNER JOIN tb_user USING(UserID) INNER JOIN rm_info WHERE QueueID = '" . $_GET['status_update_id'] . "'; ";
-                $result_su = mysqli_query($conn, $sql_su);
-                $row_su = mysqli_fetch_array($result_su);
-                ?>
-                <div class="mb-3">
+              <div class="col col-12 col-sm-12 col-lg-12 col-xl-12">
+                <form action="status_update_db.php" method="post">
+                  <?php
+                  $sql_su = "SELECT * FROM `queue_arranged` INNER JOIN tb_user USING(UserID) INNER JOIN rm_info WHERE QueueID = '" . $_GET['status_update_id'] . "'; ";
+                  $result_su = mysqli_query($conn, $sql_su);
+                  $row_su = mysqli_fetch_array($result_su);
+                  ?>
                   <div class="mb-3">
-                    <label for="num_sack">สถานะปัจจุบัน</label><br>
-                    <input type="text" name="status" id="num_sack" value="<?= $row_su['status'] ?>" readonly>
+                    <div class="mb-3">
+                      <div class="radio-group">
+                        <label for="num_sack">สถานะปัจจุบัน</label>
+
+                        <input type="radio" name="status_update" id="status1" value="รอดำเนินการ">
+                        <label for="status1">รอดำเนินการ</label>
+
+                        <input type="radio" name="status_update" id="status2" value="กำลังดำเนินการ">
+                        <label for="status2">กำลังดำเนินการ</label>
+
+                        <input type="radio" name="status_update" id="status3" value="เสร็จสิ้น">
+                        <label for="status3">เสร็จสิ้น</label>
+
+                        <input type="radio" name="status_update" id="status4" value="ลูกค้ารับข้าวไปแล้ว">
+                        <label for="status4">ลูกค้ารับข้าวไปแล้ว</label>
+
+                        <br><input type="text" name="status" id="num_sack" value="<?= $row_su['status'] ?>" readonly>
+                      </div>
+                    </div>
+                    <button type="submit" name="status_update_sub" class="btn btn-success editlink">อัพเดต</button>
+                    <a href="./status.php" class="btn btn-danger">กลับ</a>
                   </div>
-                  <div class="mb-3">
-                  <input type="radio" name="status_update" id="status1" value="รอดำเนินการ">
-                  <label for="status1">รอดำเนินการ</label><br>
-                </div>
-                <div class="mb-3">
-                  <input type="radio" name="status_update" id="status2" value="กำลังดำเนินการ">
-                  <label for="status2">กำลังดำเนินการ</label><br>
-                </div>
-                <div class="mb-3">
-                  <input type="radio" name="status_update" id="status3" value="เสร็จสิ้น">
-                  <label for="status3">เสร็จสิ้น</label><br>
-                </div>
-                <div class="mb-3">  
-                  <input type="radio" name="status_update" id="status4" value="ลูกค้ารับข้าวไปแล้ว">
-                  <label for="status4">ลูกค้ารับข้าวไปแล้ว</label><br>
-                </div>
-                  <button type="submit" name="status_update_sub" class="btn btn-success editlink">อัพเดต</button>
-                  <a href="./status.php" class="btn btn-danger">กลับ</a>
-                </div>
-              </form>
+                </form>
+              </div>
             </div>
-            <!-- จบตารางแสดงคิวทั้งหมด -->
+            <!-- จบแสดงการอัพเตตสถานะ -->
           </div>
         </div>
       </div>
